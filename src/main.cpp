@@ -16,11 +16,12 @@ void setup() {
     }
     Serial.println();
 
-    LoRa_E32<> lora1(&Serial3, 115200, 10, 11);
-    LoRa_E32<> lora2(&Serial2, 115200, 22, 23);
-//    LoRa_E32 lora(&Serial3, 115200, DDRB, DDRB, PORTB, PORTB, PB6, PB7);
+    LoRa_E32<> lora1(&Serial3, 9600, 10, 11);
+//    LoRa_E32<> lora2(&Serial2, 115200, 22, 23);
+//    LoRa_E32<> lora3(&Serial2, 9600U, &DDRH, &DDRH, &PORTH, &PORTH, (1 << PH2), (1 << PH3));
 
-    LoRa_E32<> *arr[] = {&lora1, &lora2};
+//    LoRa_E32<> *arr[] = {&lora1, &lora2, &lora3};
+    LoRa_E32<> *arr[] = {&lora1};
 
     for (const LoRa_E32<> *lora_ptr: arr) {
         LoRa_E32<> lora = *lora_ptr;
@@ -35,8 +36,8 @@ void setup() {
 
         lora.print_params();
         Serial.println("----------");
-        lora.cmd_set_params(0, LoRaCFG::LORA_BAUD_115200, LoRaCFG::LORA_8N1,
-                            LoRa_E32<>::LORA_RATE_2400, LoRa_E32<>::LORA_CHANNEL_0,
+        lora.cmd_set_params(0, LoRaCFG::LORA_BAUD_9600, LoRaCFG::LORA_8N1,
+                            LoRa_E32<>::LORA_RATE_2400, 53,
                             LoRaCFG::LORA_TX_MAX, false, true);
         lora.cmd_write_params();
         delay(500);

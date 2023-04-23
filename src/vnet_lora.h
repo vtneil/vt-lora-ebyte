@@ -114,6 +114,10 @@ namespace impl {
             m_SerialLoRa->begin(m_baud);
         }
 
+        virtual void end() {
+            m_SerialLoRa->end();
+        }
+
         virtual void begin_cfg() {
             *PORT_M0 |= (MASK_M0);     // Set M0 = 1
             *PORT_M1 |= (MASK_M1);     // Set M1 = 1 (Sleep Mode)
@@ -125,19 +129,15 @@ namespace impl {
         }
 
         virtual void end_cfg() {
-            *PORT_M0 &= (~MASK_M0);     // Set M0 = 0
-            *PORT_M1 &= (~MASK_M1);     // Set M1 = 0 (Normal Mode)
-
-            delay(100);
-
-            m_SerialLoRa->end();
-            m_SerialLoRa->begin(m_baud);
+            this->end();
         }
 
-        virtual void cmd_get_params() {
+        virtual bool cmd_get_params() {
             write_triple(0xc1);
 
-            while (!m_SerialLoRa->available());
+            while (!m_SerialLoRa->available()) {
+                if (Serial.available()) { delay(100); Serial.flush(); return false; }
+            }
 
             delay(100);
 
@@ -149,6 +149,8 @@ namespace impl {
                 ++i;
             }
             Serial.println();
+
+            return true;
         }
 
         virtual void cmd_write_params() {

@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include "vnet_lora.h"
 
-//#define CFG_E32
-#define CFG_E34
+#define CFG_E32
+//#define CFG_E34
 
 void setup() {
     Serial.begin(115200);
@@ -16,27 +16,39 @@ void setup() {
     }
     Serial.println();
 
-    LoRa_E32 lora(&Serial3, 115200, 10, 11);
+    LoRa_E32<> lora1(&Serial3, 115200, 10, 11);
+    LoRa_E32<> lora2(&Serial2, 115200, 22, 23);
 //    LoRa_E32 lora(&Serial3, 115200, DDRB, DDRB, PORTB, PORTB, PB6, PB7);
 
-    Serial.println("Initialized LoRa.");
+    LoRa_E32<> *arr[] = {&lora1, &lora2};
 
-    lora.begin_cfg();
-    Serial.println("Began config.");
+    for (const LoRa_E32<> *lora_ptr: arr) {
+        LoRa_E32<> lora = *lora_ptr;
 
-    lora.cmd_get_params();
-    Serial.println("Param got.");
+        Serial.println("Initialized LoRa.");
 
-    lora.print_params();
-    Serial.println("----------");
-    lora.cmd_set_params(0, LoRa_E32::LORA_BAUD_9600, LoRa_E32::LORA_8N1,
-                        LoRa_E32::LORA_RATE_2400, LoRa_E32::LORA_CHANNEL_12,
-                        LoRa_E32::LORA_TX_MAX, true, true);
-    lora.cmd_write_params();
-    delay(500);
-    lora.cmd_get_params();
-    lora.print_params();
+        lora.begin_cfg();
+        Serial.println("Began config.");
+
+        lora.cmd_get_params();
+        Serial.println("Param got.");
+
+        lora.print_params();
+        Serial.println("----------");
+        lora.cmd_set_params(0, LoRaCFG::LORA_BAUD_115200, LoRaCFG::LORA_8N1,
+                            LoRa_E32<>::LORA_RATE_2400, LoRa_E32<>::LORA_CHANNEL_0,
+                            LoRaCFG::LORA_TX_MAX, false, true);
+        lora.cmd_write_params();
+        delay(500);
+        lora.cmd_get_params();
+        lora.print_params();
+        Serial.println("=-=-=-=-=-=");
+
+        lora.end_cfg();
+    }
+
     Serial.println("===== End of Configuration =====");
+
 #elif defined(CFG_E34)
     Serial.print("Beginning config");
 
@@ -46,8 +58,8 @@ void setup() {
     }
     Serial.println();
 
-    LoRa_E34 lora1(&Serial3, 115200, 10, 11);
-    LoRa_E34 lora2(&Serial2, 115200, 22, 23);
+    LoRa_E34 lora1(&Serial3, 38400, 10, 11);
+    LoRa_E34 lora2(&Serial2, 38400, 22, 23);
 
     Serial.println("Initialized LoRa.");
 
@@ -59,13 +71,14 @@ void setup() {
 
     lora1.print_params();
     Serial.println("----------");
-    lora1.cmd_set_params(0, LoRa_E34::LORA_BAUD_115200, LoRa_E34::LORA_8N1,
+    lora1.cmd_set_params(0, LoRa_E34::LORA_BAUD_38400, LoRa_E34::LORA_8N1,
                         LoRa_E34::LORA_RATE_250k, LoRa_E34::LORA_CHANNEL_0,
                         LoRa_E34::LORA_TX_MAX, true);
     lora1.cmd_write_params();
     delay(500);
     lora1.cmd_get_params();
     lora1.print_params();
+    lora1.end_cfg();
     Serial.println("===== End of Configuration =====");
 
     delay(1000);
@@ -88,24 +101,24 @@ void setup() {
 
     lora2.print_params();
     Serial.println("----------");
-    lora2.cmd_set_params(0, LoRa_E34::LORA_BAUD_115200, LoRa_E34::LORA_8N1,
+    lora2.cmd_set_params(0, LoRa_E34::LORA_BAUD_38400, LoRa_E34::LORA_8N1,
                         LoRa_E34::LORA_RATE_250k, LoRa_E34::LORA_CHANNEL_0,
                         LoRa_E34::LORA_TX_MAX, true);
     lora2.cmd_write_params();
     delay(500);
     lora2.cmd_get_params();
     lora2.print_params();
+    lora2.end_cfg();
     Serial.println("===== End of Configuration =====");
 #else
-    Serial.println("BEGIN");
-
     LoRa_E34 lora1(&Serial3, 115200, 10, 11);
-//    LoRa_E34 lora1(&Serial3, 115200, &DDRB, &DDRB, &PORTB, &PORTB, PB4, PB5);
     LoRa_E34 lora2(&Serial2, 115200, 22, 23);
-//    LoRa_E34 lora2(&Serial2, 115200, &DDRA, &DDRA, &PORTA, &PORTA, PA0, PA1);
 
-    lora1.begin_normal(115200);
-    lora2.begin_normal(115200);
+    lora1.begin_normal();
+    lora2.begin_normal();
+
+    pinMode(30, OUTPUT);
+    digitalWrite(30, 1);
 
     delay(100);
 #endif
@@ -113,25 +126,22 @@ void setup() {
 
 void loop() {
 #if !defined(CFG_E32) && !defined(CFG_E34)
-    static uint32_t tim = millis();
-    static uint32_t cnt_tx = 0;
-    static uint32_t cnt_rx = 0;
+//    static HardwareSerial &Tx = Serial3;
+    static HardwareSerial &Rx = Serial2;
 
-    while (Serial2.available()) {
-        Serial2.read();
-        ++cnt_rx;
-        Serial.print("RX ");
-        Serial.println(cnt_rx);
+    while (Rx.available()) {
+        Serial.write(Rx.read());
     }
 
-    if (millis() - tim >= 50) {
-        for (uint32_t i = 0; i < 64; ++i) {
-            Serial3.write((uint8_t) 0xaa);
-            ++cnt_tx;
-        }
-        Serial.print("++++++++TX ");
-        Serial.println(cnt_tx);
-        tim = millis();
-    }
+//    static unsigned long tim = millis();
+//
+//    uint32_t x = 0;
+//
+//    if (millis() - tim > 1000) {
+//        for (uint8_t i = 0; i < 128; ++i)
+//            Tx.print(x++ % 10);
+//        Tx.println();
+//        tim = millis();
+//    }
 #endif
 }

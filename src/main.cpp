@@ -1,12 +1,14 @@
 #include <Arduino.h>
+//#include "SoftwareSerial.h"
 #include "vt_lora"
-
-//#define RX
 
 using namespace vt;
 
+//SoftwareSerial ss(8, 9);
+
 lora_e22 lora_tx(Serial3, 2, 4);
 lora_e22 lora_rx(Serial1, 3, 5);
+//lora_e22 lora_rx(ss, 3, 5);
 
 void setup() {
     pinMode(LED_BUILTIN, OUTPUT);
@@ -21,7 +23,7 @@ void setup() {
         lora->set_param(0xffff,
                         0,
                         9600,
-                        PARITY_8N1,
+                        LoRaParity::PARITY_8N1,
                         2400,
                         63,
                         240,
@@ -41,10 +43,10 @@ void loop() {
     Serial.println("Sent!");
 
     // Test tx
-    lora_tx.serial().println("Message");
+    lora_tx.hw_serial().println("Message");
 
     // Test rx
-    while (lora_rx.serial().available()) Serial.write(lora_rx.serial().read());
+    while (lora_rx.hw_serial().available()) Serial.write(lora_rx.hw_serial().read());
 
     delay(1000);
 }

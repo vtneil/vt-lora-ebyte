@@ -10,10 +10,10 @@ void setup() {
     lora.config();
     lora.set_param(0,               // Address
                    115200,          // Operational baud rate
-                   PARITY_8N1,           // Serial parity
+                   LoRaParity::PARITY_8N1,           // Serial parity
                    2400,         // Air data rate
                    0,             // Frequency channel
-                   TX_MAX,               // Tx Power
+                   LoRaTxPower::TX_MAX,               // Tx Power
                    false,        // Enable Forward Error Correction?
                    true);     // Save configuration for next boot?
 

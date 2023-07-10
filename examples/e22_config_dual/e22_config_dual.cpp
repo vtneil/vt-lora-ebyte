@@ -21,7 +21,7 @@ void setup() {
         lora->set_param(0xffff,
                         0,
                         9600,
-                        PARITY_8N1,
+                        LoRaParity::PARITY_8N1,
                         2400,
                         63,
                         240,

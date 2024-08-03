@@ -3,26 +3,27 @@
 #include "vt_lora"
 
 using namespace vt;
+using lora_t = lora_e22;
 
-//SoftwareSerial ss(8, 9);
+HardwareSerial Serial2(PA3, PA2);
 
-lora_e22 lora_tx(Serial3, 2, 4);
-lora_e22 lora_rx(Serial1, 3, 5);
-//lora_e22 lora_rx(ss, 3, 5);
+lora_t lora_tx(Serial1, PA0, PA1);
+lora_t lora_rx(Serial2, PA5, PA6);
 
 void setup() {
+    delay(5000);
     pinMode(LED_BUILTIN, OUTPUT);
-    Serial.begin(9600);
+    Serial.begin();
 
     // Begin configuration (sleep) mode.
-    lora_e22 *loras[] = {&lora_tx, &lora_rx};
+    lora_t *loras[] = {&lora_tx, &lora_rx};
     for (auto &lora: loras) {
         Serial.println("Beginning configuration mode...");
         lora->config();
         Serial.println("Entered configuration mode!");
         lora->set_param(0xffff,
                         0,
-                        9600,
+                        115200,
                         LoRaParity::PARITY_8N1,
                         2400,
                         63,
@@ -34,8 +35,8 @@ void setup() {
         Serial.println("Done config!");
     }
 
-    lora_tx.begin(9600);
-    lora_rx.begin(9600);
+    lora_tx.begin(115200);
+    lora_rx.begin(115200);
 }
 
 void loop() {

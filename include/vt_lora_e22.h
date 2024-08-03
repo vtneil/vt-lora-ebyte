@@ -45,7 +45,6 @@ namespace vt {
             params_.reg0 |= (static_cast<uint8_t>(parity) << 3);
             params_.reg0 |= (rate_to_lora(data_rate));
             params_.reg1 |= (len_to_lora(packet_length) << 6);
-            params_.reg1 |= (0b11);
             params_.reg2 |= (channel > 83 ? 0 : channel);
 
             write_to_module(params_.head, 0x00, 9);  // Start address

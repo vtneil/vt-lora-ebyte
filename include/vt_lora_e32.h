@@ -83,7 +83,7 @@ namespace vt {
                 print_base16(config[i]);
                 Serial.print(": (");
                 print_base2(config[i]);
-                Serial.print(") ");
+                Serial.println(") ");
                 ++i;
             }
         }

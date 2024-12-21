@@ -1,8 +1,8 @@
 {
     "name": "vt-lora-ebyte",
-    "version": "1.0.1",
+    "version": "2.0.0",
     "description": "VT EBYTE LoRa Arduino configurator",
-    "keywords": "bme280, i2c",
+    "keywords": "ebyte, lora",
     "repository": {
         "type": "git",
         "url": "https://github.com/vtneil/vt-lora-ebyte.git"
